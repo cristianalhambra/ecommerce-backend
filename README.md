@@ -102,9 +102,7 @@ DELETE /api/products/{id}
 
   [x] Carrito de compras con CRUD
 
-  [ ] Pestaña Perfil de usuario
-
-  [ ] Añadir roles
+  [x] Pestaña Perfil de usuario
  
   [ ] Mejorar la interfaz con fotos y un estilo de página sencillo
 
