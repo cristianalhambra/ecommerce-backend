@@ -65,7 +65,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/login", // Permite acceso a endpoints de autenticación (login, register)
                                          "/api/auth/register",
-                                         "/api/products/**" // Permite acceso público a productos
+                                         "/api/products/**", // Permite acceso público a productos
+                                         "/product-images/**", // Permite acceso a imágenes de productos
+                                         "/uploads/**"  // Permite acceso a imágenes subidas
                         ).permitAll()
                         // Cualquier otra petición (como login) debe ser autenticada
                         .anyRequest().authenticated()

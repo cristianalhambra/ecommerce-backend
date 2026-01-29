@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 @Service
 public class UserService {
@@ -63,14 +66,27 @@ public class UserService {
     }
 
     public String updateAvatar(Long userId, MultipartFile file) throws IOException {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Aquí guardas el archivo donde quieras
-        String avatarUrl = "uploads/" + file.getOriginalFilename();
-        user.setAvatarUrl(avatarUrl);
-        userRepository.save(user); return avatarUrl;
-    }
+
+        // 1. Obtener usuario
+        User user = userRepository.findById(userId) .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // 2. Crear nombre único del archivo
+        String fileName = "avatar_" + userId + ".png";
+
+        // 3. Guardar archivo en carpeta /uploads
+        Path uploadPath = Paths.get("uploads/" + fileName); Files.write(uploadPath, file.getBytes());
+
+        // 4. Crear URL pública
+        String url = "http://localhost:8080/uploads/" + fileName;
+
+        // 5. Guardar URL en BD
+        user.setAvatarUrl(url); userRepository.save(user);
+
+        // 6. Devolver URL al controlador
+        return url;
+}
+
     public void deleteAccount(Long userId) {
         userRepository.deleteById(userId);
     }

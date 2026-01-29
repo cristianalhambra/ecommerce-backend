@@ -2,9 +2,18 @@ package com.tienda.ecommerce.controller;
 
 import com.tienda.ecommerce.model.Product;
 import com.tienda.ecommerce.repository.ProductRepository;
+import com.tienda.ecommerce.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -14,6 +23,8 @@ public class ProductController {
 
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private ProductService productService;
 
     // GET - Listar todos
     @GetMapping public List<Product> getAllProducts() {
@@ -21,7 +32,8 @@ public class ProductController {
     }
 
     // GET - Obtener por ID
-    @GetMapping("/{id}") public Optional<Product> getProductById(@PathVariable Long id) {
+    @GetMapping("/{id}") public Optional<Product> getProductById(
+            @PathVariable Long id) {
         return productRepository.findById(id);
     }
 
@@ -33,7 +45,8 @@ public class ProductController {
 
     // PUT - Actualizar producto
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
+    public Product updateProduct(@PathVariable Long id,
+                                 @RequestBody Product product) {
         product.setId(id);
         return productRepository.save(product);
     }
@@ -42,5 +55,31 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {
         productRepository.deleteById(id);
+    }
+
+    //SUBIR IMÁGENES DE PRODUCTOS
+    @PostMapping("/upload-image")
+    public ResponseEntity<?> uploadProductImage(
+            @RequestParam("image") MultipartFile file
+    ) throws IOException {
+
+        // Nombre único
+        String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+
+        // Guardar archivo
+        Path path = Paths.get("product-images/" + fileName);
+        Files.write(path, file.getBytes());
+
+        // URL pública
+        String url = "http://localhost:8080/product-images/" + fileName;
+        return ResponseEntity.ok(Map.of("imageUrl", url));
+    }
+    // ASIGNAR IMAGEN A PRODUCTO
+    @PutMapping("/{id}/image") public ResponseEntity<?> setProductImage(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body ) {
+        String imageUrl = body.get("imageUrl");
+        Product updated = productService.updateProductImage(id, imageUrl);
+        return ResponseEntity.ok(updated);
     }
 }
