@@ -104,7 +104,9 @@ DELETE /api/products/{id}
 
   [x] Pestaña Perfil de usuario
  
-  [ ] Mejorar la interfaz con fotos y un estilo de página sencillo
+  [X] Mejorar la interfaz con fotos y un estilo de página sencillo
+
+  [ ] Terminar con un historial de pedidos
 
 📄 Licencia
 
